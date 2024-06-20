@@ -1,45 +1,28 @@
 #Week 6(Write a program to implement k-fold cross-validation using k-NN classifiers. Measure accuracy, recall, precision. Draw RoC.)
+
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.datasets import load_breast_cancer
+plt.style.use('ggplot')
+
+#insert file of diabetes.csv
+df = pd.read_csv("diabetes.csv")
+
+X = df.drop('Outcome',axis=1).values
+y = df['Outcome'].values
+
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.4,random_state=42, stratify=y)
+
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import KFold, cross_val_score
-from sklearn.metrics import accuracy_score, precision_score,recall_score, roc_curve, auc
+neighbors = np.arange(1,9)
+train_accuracy =np.empty(len(neighbors))
+test_accuracy = np.empty(len(neighbors))
 
-data = load_breast_cancer()
-X = data.data
-y = data.target
+for i,k in enumerate(neighbors):
+  knn = KNeighborsClassifier(n_neighbors=k)
 
-# Define the k-NN classifier and k-fold cross-validation
-clf = KNeighborsClassifier(n_neighbors=5)
-kf = KFold(n_splits=5, shuffle=True, random_state=42)
+knn.fit(X_train, y_train)
 
-# Perform k-fold cross-validation and measure performance
-accuracy_scores = cross_val_score(clf, X, y, cv=kf,
-scoring='accuracy')
-precision_scores = cross_val_score(clf, X, y, cv=kf,
-scoring='precision')
-recall_scores = cross_val_score(clf, X, y, cv=kf, scoring='recall')
-
-# Print the performance metrics
-print("Accuracy scores:", accuracy_scores)
-print("Mean accuracy:", np.mean(accuracy_scores))
-print("Precision scores:", precision_scores)
-print("Mean precision:", np.mean(precision_scores))
-print("Recall scores:", recall_scores)
-print("Mean recall:", np.mean(recall_scores))
-#run the program
-
-clf.fit(X_train, y_train)
-fpr, tpr, thresholds = roc_curve(y_test, clf.predict_proba(X_test)[:, 1])
-roc_auc = auc(fpr, tpr)
-
-# Plot ROC curve
-plt.figure()
-plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic (ROC) Curve')
-plt.legend(loc="lower right")
-plt.show()
+train_accuracy[i] = knn.score(X_train, y_train)
+test_accuracy[i] = knn.score(X_test, y_test)
