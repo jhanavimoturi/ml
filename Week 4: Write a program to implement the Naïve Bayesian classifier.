@@ -1,3 +1,4 @@
+#Week 4: Write a program to implement the Naïve Bayesian classifier.
 from sklearn.datasets import load_iris
 iris = load_iris()
 
