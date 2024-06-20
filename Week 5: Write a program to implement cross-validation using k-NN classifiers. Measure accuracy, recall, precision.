@@ -1,0 +1,23 @@
+#Week 5: Write a program to implement cross-validation using k-NN classifiers. Measure accuracy, recall, precision.
+
+import numpy as np
+from sklearn.datasets import make_blobs
+from sklearn.model_selection import cross_val_score, cross_validate
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+#Generate synthetic dataset
+X, y = make_blobs(n_samples=1000, centers=2, random_state=42)
+
+#Initialize KNN classifier
+knn= KNeighborsClassifier(n_neighbors=5)
+
+#perform cross-validation with scoring metrics
+scoring = ['accuracy','precision','recall']
+scores = cross_validate(knn, X, y, scoring = scoring, cv=5, return_train_score = False)
+
+#print results
+print("Cross-validation results:")
+print("Accuracy: {:.2f}".format(np.mean(scores['test_accuracy'])))
+print("Precision: {:.2f}".format(np.mean(scores['test_precision'])))
+print("Recall: {:.2f}".format(np.mean(scores['test_recall'])))
