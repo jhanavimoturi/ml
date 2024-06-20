@@ -1,0 +1,37 @@
+from sklearn.datasets import load_iris
+import pandas as pd
+import numpy as np
+
+iris = load_iris()
+X = pd.DataFrame(iris.data, columns=iris.feature_names)
+y = pd.Categorical.from_codes(iris.target, iris.target_names)
+
+# Convert categorical data into dummy/indicator variables.
+y = pd.get_dummies(y)
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+from sklearn.tree import DecisionTreeClassifier
+dt=DecisionTreeClassifier()
+dt.fit(X_train, y_train)
+#run the program
+
+import graphviz
+from sklearn.tree import export_graphviz
+from IPython.display import display
+display(graphviz.Source(export_graphviz(dt)))
+#run the program
+
+# Predict the class labels for the testing set
+y_pred=dt.predict(X_test)
+
+from sklearn.metrics import confusion_matrix,accuracy_score
+species = np.array(y_test).argmax(axis=1)
+predictions = np.array(y_pred).argmax(axis=1)
+print(confusion_matrix(species, predictions))
+#run the program
+
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: {:.2f}%".format(accuracy * 100))
+#run the program
