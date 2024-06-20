@@ -1,0 +1,45 @@
+#Week 6(Write a program to implement k-fold cross-validation using k-NN classifiers. Measure accuracy, recall, precision. Draw RoC.)
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import KFold, cross_val_score
+from sklearn.metrics import accuracy_score, precision_score,recall_score, roc_curve, auc
+
+data = load_breast_cancer()
+X = data.data
+y = data.target
+
+# Define the k-NN classifier and k-fold cross-validation
+clf = KNeighborsClassifier(n_neighbors=5)
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Perform k-fold cross-validation and measure performance
+accuracy_scores = cross_val_score(clf, X, y, cv=kf,
+scoring='accuracy')
+precision_scores = cross_val_score(clf, X, y, cv=kf,
+scoring='precision')
+recall_scores = cross_val_score(clf, X, y, cv=kf, scoring='recall')
+
+# Print the performance metrics
+print("Accuracy scores:", accuracy_scores)
+print("Mean accuracy:", np.mean(accuracy_scores))
+print("Precision scores:", precision_scores)
+print("Mean precision:", np.mean(precision_scores))
+print("Recall scores:", recall_scores)
+print("Mean recall:", np.mean(recall_scores))
+#run the program
+
+clf.fit(X_train, y_train)
+fpr, tpr, thresholds = roc_curve(y_test, clf.predict_proba(X_test)[:, 1])
+roc_auc = auc(fpr, tpr)
+
+# Plot ROC curve
+plt.figure()
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc="lower right")
+plt.show()
